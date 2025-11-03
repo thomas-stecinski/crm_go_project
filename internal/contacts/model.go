@@ -1,11 +1,11 @@
 package contacts
 
 type Contact struct {
-    ID    int    json:"id"
-    Nom   string json:"nom"
-    Email string json:"email"
+	ID    int    `json:"id"`
+	Nom   string `json:"nom"`
+	Email string `json:"email"`
 }
 
 func (c Contact) IsValid() bool {
-    return c.Nom != "" && c.Email != ""
+	return c.Nom != "" && c.Email != ""
 }
