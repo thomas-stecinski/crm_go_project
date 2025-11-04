@@ -20,8 +20,8 @@ type SmsNotifier struct {
 	BodyPreview string
 }
 
-var _ store.Notifier = (*EmailNotifier)(nil)
-var _ store.Notifier = (*SmsNotifier)(nil)
+var _ Notifier = (*EmailNotifier)(nil)
+var _ Notifier = (*SmsNotifier)(nil)
 
 func (e EmailNotifier) Send(message string) error {
 	if !e.IsValid() {

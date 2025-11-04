@@ -6,9 +6,33 @@ import (
 
 	"github.com/thomas-stecinski/crm_go_project/internal/cli"
 	"github.com/thomas-stecinski/crm_go_project/internal/contacts"
+	"github.com/thomas-stecinski/crm_go_project/internal/notifier"
 )
 
 func main() {
+
+	// slice de notifier.Notifier
+	notifiers := []notifier.Notifier{
+		notifier.EmailNotifier{
+			From:     "no-reply@shop.com",
+			To:       "client@example.com",
+			Subject:  "Confirmation de commande",
+			SMTPHost: "smtp.shop.com",
+			SMTPPort: 587,
+		},
+		notifier.SmsNotifier{
+			From:     "ShopBot",
+			To:       "+33612345678",
+			Provider: "Twilio",
+		},
+	}
+
+	message := "Votre commande a été expédiée !"
+
+	for _, n := range notifiers {
+		n.Send(message)
+	}
+
 	add := flag.Bool("add", false, "Ajouter un contact en mode non interactif")
 	id := flag.Int("id", 0, "ID du contact (optionnel, auto si 0)")
 	name := flag.String("name", "", "Nom du contact")
