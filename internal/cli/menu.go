@@ -11,7 +11,7 @@ import (
 )
 
 type App struct {
-	Store *contacts.Store
+	Store contacts.ContactStore
 }
 
 func (a *App) RunInteractive() {

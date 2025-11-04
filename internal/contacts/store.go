@@ -10,12 +10,23 @@ import (
 
 var ErrNotFound = errors.New("contact introuvable")
 
+type ContactStore interface {
+	Add(c Contact) (Contact, error)
+	Get(id int) (Contact, error)
+	All() []Contact
+	Update(id int, upd Contact) error
+	Delete(id int) error
+}
+
 type Store struct {
 	mu       sync.Mutex
 	items    map[int]Contact
 	nextID   int
 	jsonPath string
 }
+
+// Verify that Store implements ContactStore
+var _ ContactStore = (*Store)(nil)
 
 func NewStore(jsonPath string) *Store {
 	s := &Store{
