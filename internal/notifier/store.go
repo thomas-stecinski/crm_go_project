@@ -1,3 +1,4 @@
+// internal/notifier/store.go
 package notifier
 
 type Notifier interface {

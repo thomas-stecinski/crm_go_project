@@ -1,3 +1,4 @@
+// cmd/mini-crm/main.go
 package main
 
 import (

@@ -1,3 +1,4 @@
+// internal/contacts/store.go
 package contacts
 
 import (

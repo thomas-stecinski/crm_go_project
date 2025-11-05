@@ -1,3 +1,4 @@
+// internal/notifier/notifier.go
 package notifier
 
 import (
