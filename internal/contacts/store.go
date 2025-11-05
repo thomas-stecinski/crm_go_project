@@ -4,7 +4,9 @@ package contacts
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"os"
+	"sort"
 	"strconv"
 	"sync"
 )
@@ -26,7 +28,7 @@ type Store struct {
 	jsonPath string
 }
 
-// Verify that Store implements ContactStore
+// Vérifie que Store implémente ContactStore
 var _ ContactStore = (*Store)(nil)
 
 func NewStore(jsonPath string) *Store {
@@ -48,7 +50,7 @@ func (s *Store) Add(c Contact) (Contact, error) {
 		s.nextID++
 	} else {
 		if _, ok := s.items[c.ID]; ok {
-			return Contact{}, errors.New("ID déjà utilisé: " + strconv.Itoa(c.ID))
+			return Contact{}, fmt.Errorf("ID déjà utilisé: %s", strconv.Itoa(c.ID))
 		}
 		if c.ID >= s.nextID {
 			s.nextID = c.ID + 1
@@ -56,7 +58,10 @@ func (s *Store) Add(c Contact) (Contact, error) {
 	}
 
 	s.items[c.ID] = c
-	_ = s.save()
+	if err := s.save(); err != nil {
+		// revert en cas d'échec ?
+		return Contact{}, err
+	}
 	return c, nil
 }
 
@@ -76,6 +81,8 @@ func (s *Store) All() []Contact {
 	for _, c := range s.items {
 		out = append(out, c)
 	}
+	// tri par ID pour un ordre stable
+	sort.Slice(out, func(i, j int) bool { return out[i].ID < out[j].ID })
 	return out
 }
 
@@ -105,9 +112,14 @@ func (s *Store) Delete(id int) error {
 func (s *Store) load() error {
 	f, err := os.Open(s.jsonPath)
 	if err != nil {
+		// Si le fichier n'existe pas encore, on considère que c'est ok (store vide)
+		if errors.Is(err, os.ErrNotExist) {
+			return nil
+		}
 		return err
 	}
 	defer f.Close()
+
 	var arr []Contact
 	if err := json.NewDecoder(f).Decode(&arr); err != nil {
 		return err
@@ -123,17 +135,28 @@ func (s *Store) load() error {
 	return nil
 }
 
+// save atomique: écrit dans un .tmp puis rename
 func (s *Store) save() error {
-	tmp := make([]Contact, 0, len(s.items))
+	tmpSlice := make([]Contact, 0, len(s.items))
 	for _, c := range s.items {
-		tmp = append(tmp, c)
+		tmpSlice = append(tmpSlice, c)
 	}
-	f, err := os.Create(s.jsonPath)
+
+	tmpPath := s.jsonPath + ".tmp"
+	f, err := os.Create(tmpPath)
 	if err != nil {
 		return err
 	}
-	defer f.Close()
 	enc := json.NewEncoder(f)
 	enc.SetIndent("", "  ")
-	return enc.Encode(tmp)
+	if err := enc.Encode(tmpSlice); err != nil {
+		f.Close()
+		_ = os.Remove(tmpPath)
+		return err
+	}
+	if err := f.Close(); err != nil {
+		_ = os.Remove(tmpPath)
+		return err
+	}
+	return os.Rename(tmpPath, s.jsonPath)
 }
