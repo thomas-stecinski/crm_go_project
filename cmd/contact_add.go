@@ -1,4 +1,3 @@
-// cmd/contact_add.go
 package cmd
 
 import (
@@ -33,7 +32,7 @@ var contactAddCmd = &cobra.Command{
 		if err != nil {
 			return fmt.Errorf("ajout impossible: %w", err)
 		}
-		fmt.Printf("✅ Contact ajouté (ID=%s)\n", idToStr(c.ID))
+		fmt.Printf("Contact ajouté (ID=%s)\n", idToStr(c.ID))
 		return nil
 	},
 }

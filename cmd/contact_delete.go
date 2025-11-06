@@ -1,4 +1,3 @@
-// cmd/contact_delete.go
 package cmd
 
 import (
@@ -25,7 +24,7 @@ var contactDeleteCmd = &cobra.Command{
 			}
 			return fmt.Errorf("suppression impossible: %w", err)
 		}
-		fmt.Printf("🗑️  Contact %d supprimé.\n", delID)
+		fmt.Printf("Contact %d supprimé.\n", delID)
 		return nil
 	},
 }
