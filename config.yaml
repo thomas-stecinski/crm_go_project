@@ -1,0 +1,4 @@
+# config.yaml
+backend: gorm
+dsn: data/contacts.db
+data: data/contacts.json
