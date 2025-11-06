@@ -1,4 +1,3 @@
-// cmd/root.go
 package cmd
 
 import (
@@ -8,33 +7,65 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/thomas-stecinski/crm_go_project/internal/contacts"
+	"github.com/thomas-stecinski/crm_go_project/internal/db"
 )
 
 var (
-	dataPath string
+	dataPath string // JSON file path (backend=json)
+	backend  string // "json" (par défaut) ou "gorm"
+	dsn      string // sqlite dsn (backend=gorm)
 	store    contacts.ContactStore
 )
 
 var rootCmd = &cobra.Command{
 	Use:   "mini-crm",
-	Short: "Mini CRM en ligne de commande (contacts JSON)",
+	Short: "Mini CRM en ligne de commande (contacts JSON / SQLite)",
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-		// Initialisation du store une seule fois pour toutes les sous-commandes
-		if store == nil {
-			// Crée le dossier si besoin
+		if store != nil {
+			return nil
+		}
+		switch backend {
+		case "json", "":
+			// Prépare le dossier si besoin
 			dir := filepath.Dir(dataPath)
 			if dir != "." && dir != "" {
 				_ = os.MkdirAll(dir, 0o755)
 			}
 			store = contacts.NewStore(dataPath)
+			return nil
+
+		case "gorm":
+			if dsn == "" {
+				// valeur par défaut
+				dsn = "data/contacts.db"
+			}
+			// Crée le dossier si besoin
+			dir := filepath.Dir(dsn)
+			if dir != "." && dir != "" {
+				_ = os.MkdirAll(dir, 0o755)
+			}
+
+			gdb, err := db.OpenSQLite(dsn)
+			if err != nil {
+				return err
+			}
+			gormStore, err := contacts.NewGormStore(gdb)
+			if err != nil {
+				return err
+			}
+			store = gormStore
+			return nil
+
+		default:
+			return fmt.Errorf("backend inconnu: %s (attendu: json|gorm)", backend)
 		}
-		return nil
 	},
 }
 
 func Execute() {
-	// Flag global pour toutes les sous-commandes
-	rootCmd.PersistentFlags().StringVarP(&dataPath, "data", "d", "data/contacts.json", "Chemin du fichier JSON de stockage")
+	rootCmd.PersistentFlags().StringVarP(&dataPath, "data", "d", "data/contacts.json", "Chemin du fichier JSON (backend=json)")
+	rootCmd.PersistentFlags().StringVar(&backend, "backend", "json", "Type de stockage: json | gorm")
+	rootCmd.PersistentFlags().StringVar(&dsn, "dsn", "", "DSN SQLite (ex: data/contacts.db) (backend=gorm)")
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println("Erreur:", err)
