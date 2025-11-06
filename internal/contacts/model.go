@@ -1,3 +1,4 @@
+// internal/contacts/model.go
 package contacts
 
 type Contact struct {
