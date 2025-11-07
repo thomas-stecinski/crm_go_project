@@ -32,7 +32,7 @@ Go to the project directory
 
 ```bash
 go mod tidy
-go run . interactive --data data/contacts.json
+go run . interactive --backend json --data data/contacts.json
 ```
 
 ### Use the program in non interative mode JSON
@@ -52,6 +52,11 @@ Local persistence via data/contacts.json
 
 ```bash
 go run . contact add --name "Bob" --email "bob@mail.com"
+```
+ou
+
+```bash
+go run . interactive --backend json --data data/contacts.json
 ```
 
 ### SQLite (via GORM)
