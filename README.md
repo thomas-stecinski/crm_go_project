@@ -32,12 +32,6 @@ Go to the project directory
 
 ```bash
 go mod tidy
-go run . interactive
-```
-
-Equivalent de la ligne précédente :
-
-```bash
 go run . interactive --data data/contacts.json
 ```
 
