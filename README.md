@@ -3,7 +3,6 @@
 Mini projet pour apprendre Go à travers un CRM en ligne de commande.  
 Le but : manipuler les concepts clés du langage (interfaces, CLI, persistance, configuration).
 
-
 ## Structure du projet (pour Axelle)
 
 ```bash
@@ -31,11 +30,17 @@ Go to the project directory
 
 ### Start the program in interactive mode
 
-
 ```bash
 go mod tidy
+go run . interactive
+```
+
+Equivalent de la ligne précédente :
+
+```bash
 go run . interactive --data data/contacts.json
 ```
+
 ### Use the program in non interative mode JSON
 
 ```bash
@@ -48,19 +53,24 @@ go run . contact delete --id 1
 ## Backend Storage
 
 ### JSON (par défaut)
+
 Local persistence via data/contacts.json
+
 ```bash
 go run . contact add --name "Bob" --email "bob@mail.com"
 ```
 
 ### SQLite (via GORM)
+
 Backend via GORM.
+
 ```bash
 go run . --backend gorm --dsn data/contacts.db contact add --name "Charlie" --email "charlie@mail.com"
 go run . --backend gorm --dsn data/contacts.db contact list
 ```
 
 ## Configuration (Viper)
+
 automaticaly read file config.yaml :
 
 ```bash
@@ -70,12 +80,16 @@ data: data/contacts.json
 ```
 
 Overloading possible
+
 - Flags CLI
+
 ```bash
 export CRM_BACKEND=gorm
 export CRM_DSN=data/prod.db
 ```
+
 - Env variables
+
 ```bash
 go run . --backend json --data data/test.json contact list
 ```
