@@ -50,11 +50,12 @@ go run . contact delete --id 1
 
 Local persistence via data/contacts.json
 
+Non Interactive :
 ```bash
 go run . contact add --name "Bob" --email "bob@mail.com"
 ```
-ou
 
+Interactive :
 ```bash
 go run . interactive --backend json --data data/contacts.json
 ```
@@ -62,7 +63,12 @@ go run . interactive --backend json --data data/contacts.json
 ### SQLite (via GORM)
 
 Backend via GORM.
+Interactive :
 
+```bash
+go run . interactive --backend gorm --dsn data/contacts.db
+```
+Non interactive :
 ```bash
 go run . --backend gorm --dsn data/contacts.db contact add --name "Charlie" --email "charlie@mail.com"
 go run . --backend gorm --dsn data/contacts.db contact list
