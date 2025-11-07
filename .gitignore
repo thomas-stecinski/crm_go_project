@@ -1,1 +1,4 @@
+# Ignore data files
 data/*
+*.json
+*.csv
